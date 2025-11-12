@@ -1,6 +1,5 @@
 [
-  "TEST-ID",
-  "FTSC-Tristan_Ali-mhwcqakb-URG4",
-  "FTSC-David_Scotland-mhwcrwxr-FHPU",
-  "FTSC-Trevor_Ali-mhwcv96e-KEIR"
+  { "ticketId": "FTSC-Tristan_Ali-abc123-XYZ9", "name": "Tristan Ali" },
+  { "ticketId": "FTSC-Jada_King-xyz456-ABC1", "name": "Jada King" },
+  { "ticketId": "FTSC-Zion_Pierre-xyz789-DEF2", "name": "Zion Pierre" }
 ]
