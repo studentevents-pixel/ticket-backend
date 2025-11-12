@@ -15,20 +15,23 @@ if (!fs.existsSync(DATA_FILE)) {
   fs.writeFileSync(DATA_FILE, JSON.stringify([]));
 }
 
-// Add a new ticket ID
+// Add a new ticket with name
 app.post("/tickets", (req, res) => {
-  const { ticketId } = req.body;
-  if (!ticketId) return res.status(400).json({ error: "ticketId required" });
+  const { ticketId, name } = req.body;
+  if (!ticketId || !name) return res.status(400).json({ error: "ticketId and name required" });
 
   const data = JSON.parse(fs.readFileSync(DATA_FILE));
-  if (!data.includes(ticketId)) {
-    data.push(ticketId);
+  const exists = data.some(entry => entry.ticketId === ticketId);
+
+  if (!exists) {
+    data.push({ ticketId, name });
     fs.writeFileSync(DATA_FILE, JSON.stringify(data, null, 2));
   }
+
   res.json({ success: true });
 });
 
-// ✅ Return all ticket IDs
+// Return all tickets
 app.get("/tickets", (req, res) => {
   try {
     const data = JSON.parse(fs.readFileSync(DATA_FILE));
@@ -42,8 +45,16 @@ app.get("/tickets", (req, res) => {
 app.get("/verify/:id", (req, res) => {
   const ticketId = req.params.id;
   const data = JSON.parse(fs.readFileSync(DATA_FILE));
-  const valid = data.includes(ticketId);
+  const valid = data.some(entry => entry.ticketId === ticketId);
   res.json({ valid });
+});
+
+// Find ticket(s) by name
+app.get("/find/:name", (req, res) => {
+  const name = req.params.name.trim().toLowerCase();
+  const data = JSON.parse(fs.readFileSync(DATA_FILE));
+  const matches = data.filter(entry => entry.name.toLowerCase() === name);
+  res.json(matches);
 });
 
 const PORT = process.env.PORT || 3000;
