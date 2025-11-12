@@ -5,7 +5,11 @@ const cors = require("cors");
 const bodyParser = require("body-parser");
 
 const app = express();
-app.use(cors());
+
+// ✅ Allow requests from your GitHub Pages site
+app.use(cors({
+  origin: "https://studentevents-pixel.github.io"
+}));
 app.use(bodyParser.json());
 
 const DATA_FILE = path.join(__dirname, "valid-ids.json");
