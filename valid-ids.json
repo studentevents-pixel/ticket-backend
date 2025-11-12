@@ -1,5 +1,26 @@
 [
-  { "ticketId": "FTSC-Tristan_Ali-abc123-XYZ9", "name": "Tristan Ali" },
-  { "ticketId": "FTSC-Jada_King-xyz456-ABC1", "name": "Jada King" },
-  { "ticketId": "FTSC-Zion_Pierre-xyz789-DEF2", "name": "Zion Pierre" }
+  {
+    "ticketId": "FTSC-Tristan_Ali-abc123-XYZ9",
+    "name": "Tristan Ali",
+    "amount": 150,
+    "date": "Saturday 13th December, 2025"
+  },
+  {
+    "ticketId": "FTSC-Jada_King-xyz456-ABC1",
+    "name": "Jada King",
+    "amount": 100,
+    "date": "Saturday 13th December, 2025"
+  },
+  {
+    "ticketId": "FTSC-Zion_Pierre-xyz789-DEF2",
+    "name": "Zion Pierre",
+    "amount": 150,
+    "date": "Saturday 13th December, 2025"
+  },
+  {
+    "ticketId": "FTSC-OWNER-TREVORALI-001",
+    "name": "Trevor Ali",
+    "amount": 150,
+    "date": "Saturday 13th December, 2025"
+  }
 ]
