@@ -28,6 +28,16 @@ app.post("/tickets", (req, res) => {
   res.json({ success: true });
 });
 
+// ✅ Return all ticket IDs
+app.get("/tickets", (req, res) => {
+  try {
+    const data = JSON.parse(fs.readFileSync(DATA_FILE));
+    res.json(data);
+  } catch (err) {
+    res.status(500).json({ error: "Could not read tickets file" });
+  }
+});
+
 // Verify a ticket ID
 app.get("/verify/:id", (req, res) => {
   const ticketId = req.params.id;
