@@ -6,7 +6,7 @@ const bodyParser = require("body-parser");
 
 const app = express();
 
-// ✅ Allow requests from your GitHub Pages site
+// Allow requests from your GitHub Pages site
 app.use(cors({
   origin: "https://studentevents-pixel.github.io"
 }));
@@ -19,16 +19,29 @@ if (!fs.existsSync(DATA_FILE)) {
   fs.writeFileSync(DATA_FILE, JSON.stringify([]));
 }
 
-// Add a new ticket with name
+// Add a new ticket with name + amount + date
 app.post("/tickets", (req, res) => {
-  const { ticketId, name } = req.body;
-  if (!ticketId || !name) return res.status(400).json({ error: "ticketId and name required" });
+  const { ticketId, name, amount } = req.body;
+  if (!ticketId || !name || !amount) {
+    return res.status(400).json({ error: "ticketId, name, and amount required" });
+  }
 
-  const data = JSON.parse(fs.readFileSync(DATA_FILE));
+  let data = [];
+  try {
+    data = JSON.parse(fs.readFileSync(DATA_FILE));
+  } catch (err) {
+    return res.status(500).json({ error: "Could not read tickets file" });
+  }
+
   const exists = data.some(entry => entry.ticketId === ticketId);
 
   if (!exists) {
-    data.push({ ticketId, name });
+    data.push({
+      ticketId,
+      name,
+      amount,
+      date: "Saturday 13th December, 2025"
+    });
     fs.writeFileSync(DATA_FILE, JSON.stringify(data, null, 2));
   }
 
@@ -48,15 +61,38 @@ app.get("/tickets", (req, res) => {
 // Verify a ticket ID
 app.get("/verify/:id", (req, res) => {
   const ticketId = req.params.id;
-  const data = JSON.parse(fs.readFileSync(DATA_FILE));
-  const valid = data.some(entry => entry.ticketId === ticketId);
-  res.json({ valid });
+  let data = [];
+  try {
+    data = JSON.parse(fs.readFileSync(DATA_FILE));
+  } catch (err) {
+    return res.status(500).json({ error: "Could not read tickets file" });
+  }
+
+  const ticket = data.find(entry => entry.ticketId === ticketId);
+
+  if (ticket) {
+    const ageCategory = ticket.amount >= 150 ? "Above 18" : "Under 18";
+    res.json({
+      valid: true,
+      ageCategory,
+      name: ticket.name,
+      date: ticket.date
+    });
+  } else {
+    res.json({ valid: false });
+  }
 });
 
 // Find ticket(s) by name
 app.get("/find/:name", (req, res) => {
   const name = req.params.name.trim().toLowerCase();
-  const data = JSON.parse(fs.readFileSync(DATA_FILE));
+  let data = [];
+  try {
+    data = JSON.parse(fs.readFileSync(DATA_FILE));
+  } catch (err) {
+    return res.status(500).json({ error: "Could not read tickets file" });
+  }
+
   const matches = data.filter(entry => entry.name.toLowerCase() === name);
   res.json(matches);
 });
