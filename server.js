@@ -97,5 +97,72 @@ app.get("/find/:name", (req, res) => {
   res.json(matches);
 });
 
+// Admin table view (requires Basic Auth: admin/admin)
+app.get("/admin/table", (req, res) => {
+  const authHeader = req.headers.authorization;
+
+  // Check for "admin:admin"
+  if (!authHeader || authHeader !== "Basic " + Buffer.from("admin:admin").toString("base64")) {
+    res.setHeader("WWW-Authenticate", 'Basic realm="Admin Area"');
+    return res.status(401).send("Unauthorized");
+  }
+
+  let data = [];
+  try {
+    data = JSON.parse(fs.readFileSync(DATA_FILE));
+  } catch (err) {
+    return res.status(500).send("Could not read tickets file");
+  }
+
+  // Build HTML table rows with ticket type
+  const tableRows = data.map((entry, index) => {
+    const ticketType = entry.amount >= 150 ? "Above 18" : "Under 18";
+    return `
+      <tr>
+        <td>${index + 1}</td>
+        <td>${entry.name}</td>
+        <td>${entry.ticketId}</td>
+        <td>${ticketType}</td>
+      </tr>
+    `;
+  }).join("");
+
+  const html = `
+    <!DOCTYPE html>
+    <html>
+    <head>
+      <title>Admin Ticket Table</title>
+      <style>
+        body { font-family: Arial, sans-serif; background: #f0f0f0; padding: 20px; }
+        h1 { text-align: center; }
+        table { border-collapse: collapse; width: 100%; background: #fff; }
+        th, td { border: 1px solid #ccc; padding: 8px; text-align: left; }
+        th { background: #eee; }
+        .meta { margin-bottom: 10px; }
+      </style>
+    </head>
+    <body>
+      <h1>Ticket Summary</h1>
+      <div class="meta">Total Tickets: ${data.length}</div>
+      <table>
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Name</th>
+            <th>Ticket ID</th>
+            <th>Type</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${tableRows}
+        </tbody>
+      </table>
+    </body>
+    </html>
+  `;
+
+  res.send(html);
+});
+
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => console.log(`✅ Server running on port ${PORT}`));
